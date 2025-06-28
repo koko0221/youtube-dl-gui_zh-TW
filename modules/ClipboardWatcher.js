@@ -13,7 +13,7 @@ class ClipboardWatcher {
     }
 
     resetPlaceholder() {
-        const standard = "Enter a video/playlist URL to add to the queue";
+        const standard = "輸入要新增到佇列的影片/播放清單網址";
         if (this.win != null) {
             this.win.webContents.send("updateLinkPlaceholder", {text: standard, copied: false});
         }
