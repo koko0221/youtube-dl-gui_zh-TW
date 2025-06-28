@@ -43,7 +43,7 @@ class Settings {
         this.fileAccessRetries = fileAccessRetries || 3;
         this.updateBinary = updateBinary == null ? true : updateBinary;
         this.downloadType = downloadType == null ? "video" : downloadType;
-        this.updateApplication = updateApplication == null ? true : updateApplication;
+        this.updateApplication = updateApplication == null ? false : updateApplication;
         this.cookiePath = cookiePath;
         this.statSend = statSend == null ? false : statSend;
         this.theme = theme == null ? "dark" : theme;
@@ -107,7 +107,7 @@ class Settings {
             console.log(err);
             let settings = new Settings(paths, env);
             settings.save();
-            console.log("Created new settings file.")
+            console.log("建立新的設定檔案。")
             return settings;
         }
     }
@@ -197,7 +197,7 @@ class Settings {
 
     save() {
         fs.writeFile(this.paths.settings, JSON.stringify(this.serialize()), "utf8").then(() => {
-            console.log("Saved settings file.")
+            console.log("已儲存設定")
         });
     }
 
