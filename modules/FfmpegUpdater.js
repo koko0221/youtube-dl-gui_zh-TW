@@ -19,29 +19,29 @@ class FfmpegUpdater {
     //Checks for an update and download it if there is.
     async checkUpdate() {
         if (await this.checkPreInstalled()) {
-            console.log("FFmpeg and FFprobe already installed, skipping auto-install.")
+            console.log("已安裝 FFmpeg 與 FFprobe，略過自動安裝。")
             return;
         }
-        console.log("Checking for a new version of ffmpeg.");
+        console.log("正在檢查 ffmpeg 是否有新版本。");
         const localVersion = await this.getLocalVersion();
         const { remoteFfmpegUrl, remoteFfprobeUrl, remoteVersion } = await this.getRemoteVersion();
         if(remoteVersion == null) {
-            console.log("Unable to check for new updates, ffbinaries.com may be down.");
+            console.log("無法檢查更新，ffbinaries.com 可能已離線。");
             return;
         }
         if(remoteVersion === localVersion) {
-            console.log(`ffmpeg was already up-to-date! Version: ${localVersion}`);
+            console.log(`ffmpeg 已為最新版本！版本： ${localVersion}`);
             return;
         }
         if(localVersion == null) {
-            console.log("Downloading missing ffmpeg binary.");
+            console.log("正在下載遺失的 ffmpeg 執行檔。");
         } else {
-            console.log(`New version ${remoteVersion} found. Updating...`);
+            console.log(`發現新版本 ${remoteVersion}，正在更新...`);
             this.action = "Updating to";
         }
-        this.win.webContents.send("binaryLock", {lock: true, placeholder: `Installing/Updating ffmpeg to version: ${remoteVersion}. Preparing...`})
+        this.win.webContents.send("binaryLock", {lock: true, placeholder: `正在安裝/更新 ffmpeg 到版本 ${remoteVersion}，準備中...`})
         await this.downloadUpdate(remoteFfmpegUrl, remoteVersion, "ffmpeg" + this.getFileExtension());
-        this.win.webContents.send("binaryLock", {lock: true, placeholder: `Installing/Updating ffprobe to version: ${remoteVersion}. Preparing...`})
+        this.win.webContents.send("binaryLock", {lock: true, placeholder: `正在安裝/更新 ffprobe 到版本 ${remoteVersion}，準備中...`})
         await this.downloadUpdate(remoteFfprobeUrl, remoteVersion, "ffprobe" + this.getFileExtension());
         await this.writeVersionInfo(remoteVersion);
     }
@@ -72,7 +72,7 @@ class FfmpegUpdater {
                 remoteFfprobeUrl: res.data.bin[platform].ffprobe,
             }
         } catch (err) {
-            console.error('An error occurred while retrieving the latest ffmpeg version data.')
+            console.error('取得 ffmpeg 最新版本資料時發生錯誤。')
             if (err.response != null) {
                 console.error('Status code: ' + err.response.status);
             }
@@ -103,7 +103,7 @@ class FfmpegUpdater {
         if(data == null) {
             return null;
         } else {
-            console.log("Current ffmpeg version: " + data.version);
+            console.log("目前 ffmpeg 版本： " + data.version);
             return data.version;
         }
     }
@@ -154,7 +154,7 @@ class FfmpegUpdater {
             version: version,
         };
         await fs.promises.writeFile(this.paths.ffmpegVersion, JSON.stringify(data));
-        console.log("New version data written to ffmpegVersion.");
+        console.log("新版本資訊已寫入 ffmpegVersion。");
     }
 
     getFileExtension() {
