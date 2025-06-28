@@ -2,21 +2,21 @@ const execa = require("execa");
 
 const actions = {
     "win32": {
-        "Sleep": ["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"],
-        "Lock": ["rundll32.exe", "user32.dll,LockWorkStation"],
-        "Shutdown": ["shutdown", "/s", "/f", "/t", "0"],
-        "Hibernate (if enabled)": ["shutdown", "/h", "/f", "/t", "0"],
-        "Reboot": ["shutdown", "/r", "/f", "/t", "0"],
+        "睡眠": ["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"],
+        "鎖定": ["rundll32.exe", "user32.dll,LockWorkStation"],
+        "關機": ["shutdown", "/s", "/f", "/t", "0"],
+        "休眠 (如果啟用)": ["shutdown", "/h", "/f", "/t", "0"],
+        "重新啟動": ["shutdown", "/r", "/f", "/t", "0"],
     },
     "linux": {
-        "Sleep": ["systemctl", "suspend"],
-        "Shutdown": ["shutdown", "-h", "now"],
-        "Reboot": ["shutdown", "-r", "now"]
+        "睡眠": ["systemctl", "suspend"],
+        "關機": ["shutdown", "-h", "now"],
+        "重新啟動": ["shutdown", "-r", "now"]
     },
     "darwin": {
-        "Sleep": ["pmset", "sleepnow"],
-        "Shutdown": ["shutdown", "-h", "now"],
-        "Reboot": ["shutdown", "-r", "now"]
+        "睡眠": ["pmset", "sleepnow"],
+        "關機": ["shutdown", "-h", "now"],
+        "重新啟動": ["shutdown", "-r", "now"]
     }
 }
 
