@@ -1,569 +1,492 @@
-<!DOCTYPE html>
+html
 <html lang="en">
 <head>
-	<title>Open Video Downloader</title>
+<meta charset="utf-8"/>
+<meta content="script-src 'self' 'unsafe-inline'" http-equiv="Content-Security-Policy"/>
+<title>Open Video Downloader</title>
+<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<link href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet"/>
+<link href="lib/select2.min.css" rel="stylesheet"/>
+<link href="renderer.css" rel="stylesheet"/>
+<script src="../node_modules/jquery/dist/jquery.min.js"></script>
+<script src="../node_modules/popper.js/dist/umd/popper.min.js"></script>
+<script src="lib/select2.min.js"></script>
+<script src="../node_modules/sortablejs/Sortable.min.js"></script>
 </head>
 <body>
-	html
-	<meta charset="utf-8">
-	<meta content="script-src 'self' 'unsafe-inline'" http-equiv="Content-Security-Policy">
-	<link href="../node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="../node_modules/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-	<link href="lib/select2.min.css" rel="stylesheet">
-	<link href="renderer.css" rel="stylesheet">
-	<script src="../node_modules/jquery/dist/jquery.min.js">
-	</script> 
-	<script src="../node_modules/popper.js/dist/umd/popper.min.js">
-	</script> 
-	<script src="lib/select2.min.js">
-	</script> 
-	<script src="../node_modules/sortablejs/Sortable.min.js">
-	</script>
-	<div class="container url-input">
-		<form class="row mx-auto" id="url-form" name="url-form">
-			<div class="input-group">
-				<input class="form-control" id="add-url" placeholder="Enter a video/playlist URL to add to the queue" type="text">
-				<div class="input-group-append">
-					<button class="btn btn-dark" id="add-url-btn" title="將影片新增至佇列" type="button"><i class="bi bi-plus"></i></button>
-				</div><button class="btn btn-dark" id="settingsBtn" title="設定" type="button"><i class="bi bi-gear"></i></button>
-			</div>
-		</form>
-	</div>
-	<div class="container-fluid queue-area">
-		<div class="row">
-			<div class="mx-auto queue">
-				<div class="empty">
-					<i class="header bi bi-arrow-up"></i>
-					<p class="title" title="您的佇列是空的">目前佇列為空</p>
-					<p class="undertitle">請新增影片以開始</p>
-				</div>
-				<div class="video-cards d-flex flex-wrap align-items-start"></div>
-			</div>
-		</div>
-	</div>
-	<div class="container-fluid controls">
-		<div class="row mx-auto">
-			<div class="progress mx-auto" id="totalProgress">
-				<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress-bar" role="progressbar" style="width: 0%;"></div><small class="justify-content-center d-flex position-absolute w-100">準備下載！</small>
-			</div>
-		</div>
-		<div class="row buttons d-flex flex-row justify-content-center">
-			<button class="btn btn-dark" id="locationBtn" title="下載路徑"><i class="bi bi-folder"></i></button> <button class="btn btn-dark" id="authBtn" title="添加認證"><i class="bi bi-key"></i></button> <button class="btn btn-dark" id="subtitleBtn" title="停用字幕"><i class="bi-card-text-strike mb-3" title="字幕已停用"></i></button> <span class="spacer"></span> <select aria-label="Download type option for the whole queue" class="custom-select w-auto rounded" id="download-type" title="下載類型">
-				<option selected value="video">
-					影片 + 音訊
-				</option>
-				<option value="audio">
-					僅音訊
-				</option>
-				<option value="videoOnly">
-					僅影片
-				</option>
-			</select> <select aria-label="Quality option for the whole queue" class="custom-select w-auto rounded" id="download-quality" title="品質">
-				<option selected value="best">
-					最佳
-				</option>
-				<option value="worst">
-					最差
-				</option>
-			</select> <span class="spacer"></span>
-			<div class="dropdown dropup">
-				<button aria-expanded="false" aria-haspopup="true" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" id="whenDoneButton" type="button">完成後動作</button>
-				<ul aria-labelledby="whenDoneButton" class="dropdown-menu" id="whenDoneOptions">
-					<li>
-						<a class="dropdown-item dropdown-selected" href="#">不執行任何動作</a>
-					</li>
-					<li class="dropdown-divider"></li>
-					<li>
-						<a class="dropdown-item" href="#">關閉應用程式</a>
-					</li>
-				</ul>
-			</div><span class="spacer"></span> <button class="btn btn-dark rounded" disabled id="clearBtn" title="清除佇列" type="button"><i class="bi bi-trash"></i></button> <button class="btn btn-highlight rounded" disabled id="downloadBtn" title="下載佇列">下載</button>
-		</div>
-	</div>
-	<div class="template video-card" id="id">
-		<div class="row mx-auto">
-			<div class="handle">
-				<i class="bi bi-grip-vertical"></i>
-			</div>
-			<div class="col-4"><img alt="Video thumbnail" class="mt-1" onerror="this.onerror=null;this.src='img/plain-placeholder.png';" src="img/plain-placeholder.png"></div>
-			<div class="col border-right border-dark">
-				<p class="card-title" title=""></p>
-				<div class="row">
-					<div class="col-12">
-						<div class="progress mb-3">
-							<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress-bar" role="progressbar" style="width: 0%;"></div><small class="justify-content-center d-flex position-absolute w-100"></small>
-						</div>
-					</div>
-				</div>
-				<div class="row options">
-					<div class="col-6">
-						<select class="custom-select download-type">
-							<option selected value="video">
-								影片 + 音訊
-							</option>
-							<option value="audio">
-								僅音訊
-							</option>
-							<option value="videoOnly">
-								僅影片
-							</option>
-						</select> <select class="custom-select download-encoding">
-							<option class="none" selected value="none">
-								影片編碼器
-							</option>
-						</select>
-						<p class="metadata left"></p>
-					</div>
-					<div class="col-6">
-						<select class="custom-select download-quality">
-							<option class="audio" selected value="best">
-								最佳
-							</option>
-							<option class="audio" value="worst">
-								最差
-							</option>
-							<option class="audio" value="320k">
-								320k
-							</option>
-							<option class="audio" value="256k">
-								256k
-							</option>
-							<option class="audio" value="224k">
-								224k
-							</option>
-							<option class="audio" value="192k">
-								192k
-							</option>
-							<option class="audio" value="160k">
-								160k
-							</option>
-							<option class="audio" value="128k">
-								128k
-							</option>
-							<option class="audio" value="96k">
-								96k
-							</option>
-						</select> <select class="custom-select download-audio-encoding">
-							<option class="none" selected value="none">
-								音訊編碼器
-							</option>
-						</select>
-						<p class="metadata right"></p>
-					</div>
-				</div>
-				<div class="row info">
-					<div class="col-12">
-						<p class="metadata info"></p>
-					</div>
-				</div>
-				<div class="row open">
-					<div class="col-6">
-						<button class="btn btn-dark folder">在資料夾中顯示檔案</button>
-					</div>
-					<div class="col-6">
-						<button class="btn btn-dark item">開啟檔案</button>
-					</div>
-				</div>
-				<div class="row error d-none">
-					<div class="col-6">
-						<button class="btn btn-dark" id="fullError">顯示完整錯誤訊息</button>
-					</div>
-					<div class="col-6">
-						<button class="btn btn-dark report">回報問題</button>
-					</div>
-				</div>
-			</div>
-			<div class="col-1 buttons m-auto">
-				<a class="remove-btn" data-container="body" data-content="Click again to remove" data-placement="bottom" data-toggle="popover" data-trigger="manual" tabindex="0"><i class="bi-x-circle mb-3"></i></a> <a class="subtitle-btn"><i class="bi-card-text-strike" title="Subtitles disabled"></i></a> <a class="download-btn"><i class="bi-download mb-3"></i></a> <a class="info-btn"><i class="bi-info-circle mb-3"></i></a>
-			</div>
-		</div>
-	</div>
-	<div aria-hidden="true" aria-labelledby="infoModalLabel" class="modal fade" id="infoModal" tabindex="-1">
-		<div class="modal-xl modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="infoModalLabel">影片中繼資料</h5><button aria-label="Close" class="close dismiss" type="button">×</button>
-				</div>
-				<div class="modal-body">
-					<div class="container-fluid">
-						<div class="row mb-3">
-							<div class="thumb col-7">
-								<img alt="thumbnail" class="info-img" onerror="this.onerror=null;this.src='img/plain-placeholder.png';" src="img/plain-placeholder.png" title="Click to download"> <i class="img-overlay bi bi-download" title="Click to download"></i>
-							</div>
-							<div class="col-5">
-								<p title="觀看次數"><i class="bi bi-eye"></i>-</p>
-								<p title="喜歡 / 不喜歡"><i class="bi bi-hand-thumbs-up"></i>-<i class="bi bi-hand-thumbs-down"></i>-</p>
-								<p title="平均評分"><i class="bi bi-star"></i>-</p>
-								<p title="時長"><i class="bi bi-clock"></i>-</p>
-							</div>
-						</div>
-						<textarea cols="50" id="info-description" readonly rows="5"></textarea>
-						<ul class="list-group list-group-flush">
-							<li class="list-group-item uploader"></li>
-							<li class="list-group-item extractor"></li>
-							<li class="list-group-item url"></li>
-						</ul>
-					</div><span class="identifier d-none"></span>
-				</div>
-				<div class="modal-footer">
-					<button class="btn json btn-dark" title="另存為 JSON" type="button">另存為 JSON</button> <button class="btn dismiss btn-dark" type="button">關閉</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div aria-hidden="true" aria-labelledby="subsModalLabel" class="modal fade" id="subsModal" tabindex="-1">
-		<div class="modal-xl modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="subsModalLabel">字幕設定</h5><button aria-label="Close" class="close dismiss" type="button">×</button>
-				</div>
-				<div class="modal-body">
-					<div class="container-fluid">
-						<p class="description">選擇要下載的字幕語言</p>
-						<div class="mb-1">
-							<input class="check-input" id="enableSubs" type="checkbox" value=""> <label class="check-label" for="enableSubs">下載字幕</label>
-						</div>
-						<div class="mb-3">
-							<label class="form-label d-block" for="subsLang">字幕：</label> <select class="w-75 mb-2" id="subsLang" multiple>
-							</select>
-						</div>
-						<div>
-							<label class="form-label d-block" for="autoGenSubsLang">自動產生字幕：</label> <select class="w-75 mb-2" id="autoGenSubsLang" multiple>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button class="btn subsSave btn-dark" type="button">好</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div aria-hidden="true" aria-labelledby="logModalLabel" class="modal fade" id="logModal" tabindex="-1">
-		<div class="modal-xl modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="logModalLabel">下載紀錄</h5><button aria-label="Close" class="close dismiss" type="button">×</button>
-				</div>
-				<div class="modal-body">
-					<div class="container-fluid">
-						<div class="log p-3 rounded w-100">
-							載入紀錄中…
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button class="btn save btn-dark" title="儲存為檔案" type="button">儲存為檔案</button> <button class="btn btn-dark dismiss" type="button">關閉</button>
-				</div><span class="identifier d-none"></span>
-			</div>
-		</div>
-	</div>
-	<div aria-hidden="true" aria-labelledby="authModalLabel" class="modal fade" id="authModal" tabindex="-1">
-		<div class="modal-xl modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="authModalLabel">新增驗證</h5><button aria-label="Close" class="close dismiss" type="button">×</button>
-				</div>
-				<div class="modal-body">
-					<p>新增 cookies.txt 檔案以進行驗證</p>
-					<div class="custom-file">
-						<input class="custom-file-input" id="fileInput" type="file"> <label class="custom-file-label" for="fileInput" id="fileInputLabel">點選以選擇 cookies.txt</label>
-					</div><a href="https://github.com/StefanLobbenmeier/youtube-dl-gui/wiki/Tutorial:-Private-videos-&amp;-playlists" target="_blank">什麼是 cookies.txt 檔案？</a>
-				</div>
-				<div class="modal-footer">
-					<button class="btn removeCookies btn-dark" type="button">移除 cookies</button> <button class="btn dismiss btn-highlight" type="button">好</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div aria-hidden="true" aria-labelledby="settingsModalLabel" class="modal fade" id="settingsModal" tabindex="-1">
-		<div class="modal-xl modal-dialog modal-dialog-centered">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="settingsModalLabel">應用程式設定</h5><a class="help-button" href="https://github.com/StefanLobbenmeier/youtube-dl-gui/wiki/Settings" target="_blank" title="幫助"><i class="bi bi-question-circle"></i></a> <button aria-label="Close" class="close dismiss" type="button">×</button>
-				</div>
-				<div class="modal-body">
-					<h3>效能</h3>
-					<div class="mb-4">
-						<label class="form-label" for="sizeSetting">下載大小計算</label> <select class="custom-select d-block rounded w-auto mb-2" id="sizeSetting">
-							<option selected value="full">
-								自動計算
-							</option>
-							<option value="click">
-								點選計算
-							</option>
-						</select> <input class="check-input" id="calculateTotalSize" type="checkbox" value=""> <label class="check-label" for="calculateTotalSize">計算總下載大小</label>
-					</div>
-					<div class="mb-4">
-						<label class="form-label d-inline-block" for="maxConcurrent" id="concurrentLabel">最大同時作業數</label> <input class="form-range w-50 d-block align-middle" id="maxConcurrent" max="32" min="1" type="range"> <button class="btn btn-dark" id="defaultConcurrent" type="button">重設為預設值</button>
-					</div>
-					<div class="mb-4">
-						<label class="form-label" for="fileAccessRetries">資訊請求重試次數：</label> <select class="custom-select d-block rounded w-auto mb-2" id="fileAccessRetries">
-							<option selected value="3">
-								3
-							</option>
-							<option value="10">
-								10
-							</option>
-							<option value="20">
-								20
-							</option>
-							<option value="infinite">
-								無限次
-							</option>
-						</select>
-					</div>
-					<div class="mb-4">
-						<label class="form-label" for="retries">下載重試次數：</label> <select class="custom-select d-block rounded w-auto mb-2" id="retries">
-							<option selected value="10">
-								10
-							</option>
-							<option value="50">
-								50
-							</option>
-							<option value="100">
-								100
-							</option>
-							<option value="infinite">
-								無限次
-							</option>
-						</select>
-					</div>
-					<hr>
-					<h3>外觀</h3>
-					<div class="mb-4">
-						<label class="form-label" for="theme">主題</label> <select class="custom-select d-block rounded w-auto mb-2" id="theme">
-							<option selected value="dark">
-								深色
-							</option>
-							<option value="light">
-								淺色
-							</option>
-						</select>
-					</div>
-					<hr>
-					<h3>自動更新</h3>
-					<div class="mb-1">
-						<input class="check-input" id="updateBinary" type="checkbox" value=""> <label class="check-label" for="updateBinary">自動更新 ytdl 執行檔</label>
-					</div>
-					<div>
-						<input class="check-input" id="updateApplication" type="checkbox" value=""> <label class="check-label" for="updateApplication">自動更新應用程式</label>
-					</div>
-					<hr>
-					<h3>網路</h3>
-					<div class="mb-4">
-						<label class="form-label" for="proxySetting">代理伺服器（若留空則不使用）</label> <input class="form-control" id="proxySetting" placeholder="HTTPS/SOCKS proxy URL" type="text" value="">
-					</div>
-					<div class="mb-4">
-						<label class="form-label" for="ratelimitSetting">每部影片的下載速率限制（KB/s）</label> <input class="form-control" id="ratelimitSetting" placeholder="下載速率限制（KB/s）" type="number" value="">
-					</div>
-					<hr>
-					<h3>輸入</h3>
-					<div class="mb-1">
-						<input class="check-input" id="autoFillClipboard" type="checkbox" value=""> <label class="check-label" for="autoFillClipboard">自動填入複製的連結</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="noPlaylist" type="checkbox" value=""> <label class="check-label" for="noPlaylist">當連結同時包含清單與影片時僅下載影片</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="globalShortcut" type="checkbox" value=""> <label class="check-label" for="globalShortcut">啟用全域貼上與下載快捷鍵</label>
-					</div>
-					<hr>
-					<h3>輸出</h3>
-					<div class="mb-3">
-						<label class="form-label" for="outputFormat">嘗試使用輸出格式：</label> <select class="custom-select d-block rounded w-auto mb-2" id="outputFormat">
-							<option selected value="none">
-								自動
-							</option>
-							<option value="mp4">
-								MP4
-							</option>
-							<option value="mkv">
-								MKV
-							</option>
-						</select>
-					</div>
-					<div class="mb-3">
-						<label class="form-label" for="audioOutputFormat">強制音訊下載使用輸出格式：</label> <select class="custom-select d-block rounded w-auto mb-2" id="audioOutputFormat">
-							<option selected value="none">
-								自動
-							</option>
-							<option value="mp3">
-								MP3
-							</option>
-							<option value="m4a">
-								M4A
-							</option>
-							<option value="opus">
-								Opus
-							</option>
-							<option value="vorbis">
-								Vorbis
-							</option>
-							<option value="wav">
-								WAV
-							</option>
-							<option value="aac">
-								AAC
-							</option>
-							<option value="flac">
-								FLAC
-							</option>
-						</select>
-					</div>
-					<div class="mb-1">
-						<label class="form-label" for="nameFormat">檔名格式：</label> <select class="custom-select d-block rounded w-auto mb-2" id="nameFormat">
-							<option selected value="%(title).200s-(%(height)sp%(fps).0d).%(ext)s">
-								標題 + 品質
-							</option>
-							<option value="%(title).200s.%(ext)s">
-								標題
-							</option>
-							<option value="custom">
-								自訂
-							</option>
-						</select>
-					</div>
-					<div class="mb-4">
-						<input class="form-control" disabled id="nameFormatCustom" type="text" value="%(title).200s-(%(height)sp%(fps).0d).%(ext)s">
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="downloadMetadata" type="checkbox" value=""> <label class="check-label" for="downloadMetadata">儲存中繼資料</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="downloadJsonMetadata" type="checkbox" value=""> <label class="check-label" for="downloadJsonMetadata">儲存 JSON 中繼資料</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="downloadThumbnail" type="checkbox" value=""> <label class="check-label" for="downloadThumbnail">儲存縮圖為檔案</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="keepUnmerged" type="checkbox" value=""> <label class="check-label" for="keepUnmerged">保留未合併的檔案</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="avoidFailingToSaveDuplicateFileName" type="checkbox" value=""> <label class="check-label" for="avoidFailingToSaveDuplicateFileName" title="When the target filename already exists, enumerate the filename (e.g. 'filename(1).mp4') at the cost of download resumability.">避免因重複檔名而儲存失敗</label>
-					</div>
-					<hr>
-					<h3>SponsorBlock（廣告標記）</h3>
-					<div class="mb-3">
-						<label class="form-label d-block" for="subsLang">要標記為章節的區段：</label> <select class="w-75 mb-2" id="sponsorblockMark" multiple>
-							<option value="sponsor">
-								贊助
-							</option>
-							<option value="selfpromo">
-								自我宣傳
-							</option>
-							<option value="interaction">
-								互動提醒
-							</option>
-							<option value="intro">
-								中場／片頭動畫
-							</option>
-							<option value="outro">
-								片尾卡／製作名單
-							</option>
-							<option value="preview">
-								預告／回顧
-							</option>
-							<option value="music_offtopic">
-								音樂無關內容
-							</option>
-						</select>
-					</div>
-					<div class="mb-3">
-						<label class="form-label d-block" for="autoGenSubsLang">要移除的區段：</label> <select class="w-75 mb-2" id="sponsorblockRemove" multiple>
-							<option value="sponsor">
-								贊助
-							</option>
-							<option value="selfpromo">
-								自我宣傳
-							</option>
-							<option value="interaction">
-								互動提醒
-							</option>
-							<option value="intro">
-								中場／片頭動畫
-							</option>
-							<option value="outro">
-								片尾卡／製作名單
-							</option>
-							<option value="preview">
-								預告／回顧
-							</option>
-							<option value="music_offtopic">
-								音樂無關內容
-							</option>
-						</select>
-					</div>
-					<div class="mb-1">
-						<label class="form-label" for="sponsorblockApi">SponsorBlock API 位置</label> <input class="form-control" id="sponsorblockApi" type="text" value="">
-					</div>
-					<hr>
-					<h3>進階</h3>
-					<div class="mb-1">
-						<input class="check-input" id="taskList" type="checkbox" value=""> <label class="check-label" for="taskList">重新啟動後恢復佇列</label>
-					</div>
-					<div class="mb-1">
-						<label class="check-label" for="userAgent">使用者代理字串</label> <select class="custom-select d-block rounded w-auto mb-2" id="userAgent">
-							<option selected value="spoof">
-								偽裝
-							</option>
-							<option value="empty">
-								清空
-							</option>
-							<option value="default">
-								預設
-							</option>
-						</select>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="validateCertificate" type="checkbox" value=""> <label class="check-label" for="validateCertificate">驗證 HTTPS 憑證</label>
-					</div>
-					<div class="mb-1">
-						<input class="check-input" id="enableEncoding" type="checkbox" value=""> <label class="check-label" for="enableEncoding">顯示可供下載的編碼器</label>
-					</div>
-					<div>
-						<label class="form-label" for="splitMode">播放清單切割成單部影片的條件：</label> <select class="custom-select d-block rounded w-auto mb-2" id="splitMode">
-							<option value="0">
-								永不切割
-							</option>
-							<option selected value="49">
-								少於 50 部影片時
-							</option>
-							<option value="99">
-								少於 100 部影片時
-							</option>
-							<option value="149">
-								少於 150 部影片時
-							</option>
-							<option value="199">
-								少於 200 部影片時
-							</option>
-						</select>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<p id="version"></p><button class="btn dismiss btn-dark" type="button">取消</button> <button class="btn apply btn-highlight" type="button">套用</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div aria-atomic="true" aria-live="assertive" class="toast" id="update" role="alert">
-		<div class="toast-header">
-			<strong class="mr-auto update-title">有可用的更新！</strong> <button aria-label="Close" class="ml-2 mb-1 close" data-dismiss="toast" type="button"><span aria-hidden="true">×</span></button>
-		</div>
-		<div class="toast-body update-body"></div>
-	</div>
-	<div aria-atomic="true" aria-live="assertive" class="toast" id="task-list" role="alert">
-		<div class="toast-header">
-			<strong class="mr-auto task-list-title">是否要恢復佇列？</strong> <button aria-label="Close" class="ml-2 mb-1 close" data-dismiss="toast" type="button"><span aria-hidden="true">×</span></button>
-		</div>
-		<div class="toast-body task-list-body"></div>
-	</div>
-	<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js">
-	</script> 
-	<script src="../node_modules/windowbar/dist/index.js">
-	</script> 
-	<script src="renderer.js">
-	</script>
+<div class="container url-input">
+<form class="row mx-auto" id="url-form">
+<div class="input-group">
+<input class="form-control" id="add-url" placeholder="Enter a video/playlist URL to add to the queue" type="text"/>
+<div class="input-group-append">
+<button class="btn btn-dark" id="add-url-btn" title="將影片新增至佇列" type="button"><i class="bi bi-plus"></i></button>
+</div>
+<button class="btn btn-dark" id="settingsBtn" title="設定" type="button"><i class="bi bi-gear"></i></button>
+</div>
+</form>
+</div>
+<div class="container-fluid queue-area">
+<div class="row">
+<div class="mx-auto queue">
+<div class="empty">
+<i class="header bi bi-arrow-up"></i>
+<p class="title" title="您的佇列是空的">目前佇列為空</p>
+<p class="undertitle">請新增影片以開始</p>
+</div>
+<div class="video-cards d-flex flex-wrap align-items-start"></div>
+</div>
+</div>
+</div>
+<div class="container-fluid controls">
+<div class="row mx-auto">
+<div class="progress mx-auto" id="totalProgress">
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+<small class="justify-content-center d-flex position-absolute w-100">準備下載！</small>
+</div>
+</div>
+<div class="row buttons d-flex flex-row justify-content-center">
+<button class="btn btn-dark" id="locationBtn" title="下載路徑"><i class="bi bi-folder"></i></button>
+<button class="btn btn-dark" id="authBtn" title="添加認證"><i class="bi bi-key"></i></button>
+<button class="btn btn-dark" id="subtitleBtn" title="停用字幕"><i class="bi-card-text-strike mb-3" title="字幕已停用"></i></button>
+<span class="spacer"></span>
+<select aria-label="Download type option for the whole queue" class="custom-select w-auto rounded" id="download-type" title="下載類型">
+<option selected="" value="video">影片 + 音訊</option>
+<option value="audio">僅音訊</option>
+<option value="videoOnly">僅影片</option>
+</select>
+<select aria-label="Quality option for the whole queue" class="custom-select w-auto rounded" id="download-quality" title="品質">
+<option selected="" value="best">最佳</option>
+<option value="worst">最差</option>
+</select>
+<span class="spacer"></span>
+<div class="dropdown dropup">
+<button aria-expanded="false" aria-haspopup="true" class="btn btn-dark dropdown-toggle" data-toggle="dropdown" id="whenDoneButton" type="button">完成後動作</button>
+<ul aria-labelledby="whenDoneButton" class="dropdown-menu" id="whenDoneOptions">
+<li><a class="dropdown-item dropdown-selected" href="#">不執行任何動作</a></li>
+<li class="dropdown-divider"></li>
+<li><a class="dropdown-item" href="#">關閉應用程式</a></li>
+</ul>
+</div>
+<span class="spacer"></span>
+<button class="btn btn-dark rounded" disabled="" id="clearBtn" title="清除佇列" type="button"><i class="bi bi-trash"></i></button>
+<button class="btn btn-highlight rounded" disabled="" id="downloadBtn" title="下載佇列">下載</button>
+</div>
+</div>
+<div class="template video-card" id="id">
+<div class="row mx-auto">
+<div class="handle"><i class="bi bi-grip-vertical"></i></div>
+<div class="col-4">
+<img alt="Video thumbnail" class="mt-1" nonce="imgErr" onerror="this.onerror=null;this.src='img/plain-placeholder.png';" src="img/plain-placeholder.png"/>
+</div>
+<div class="col border-right border-dark">
+<p class="card-title" title=""></p>
+<div class="row">
+<div class="col-12">
+<div class="progress mb-3">
+<div aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress-bar" role="progressbar" style="width: 0%;"></div>
+<small class="justify-content-center d-flex position-absolute w-100"></small>
+</div>
+</div>
+</div>
+<div class="row options">
+<div class="col-6">
+<select class="custom-select download-type">
+<option selected="" value="video">影片 + 音訊</option>
+<option value="audio">僅音訊</option>
+<option value="videoOnly">僅影片</option>
+</select>
+<select class="custom-select download-encoding">
+<option class="none" selected="" value="none">影片編碼器</option>
+</select>
+<p class="metadata left"></p>
+</div>
+<div class="col-6">
+<select class="custom-select download-quality">
+<option class="audio" selected="" value="best">最佳</option>
+<option class="audio" value="worst">最差</option>
+<option class="audio" value="320k">320k</option>
+<option class="audio" value="256k">256k</option>
+<option class="audio" value="224k">224k</option>
+<option class="audio" value="192k">192k</option>
+<option class="audio" value="160k">160k</option>
+<option class="audio" value="128k">128k</option>
+<option class="audio" value="96k">96k</option>
+</select>
+<select class="custom-select download-audio-encoding">
+<option class="none" selected="" value="none">音訊編碼器</option>
+</select>
+<p class="metadata right"></p>
+</div>
+</div>
+<div class="row info">
+<div class="col-12">
+<p class="metadata info"></p>
+</div>
+</div>
+<div class="row open">
+<div class="col-6">
+<button class="btn btn-dark folder">在資料夾中顯示檔案</button>
+</div>
+<div class="col-6">
+<button class="btn btn-dark item">開啟檔案</button>
+</div>
+</div>
+<div class="row error d-none">
+<div class="col-6">
+<button class="btn btn-dark" id="fullError">顯示完整錯誤訊息</button>
+</div>
+<div class="col-6">
+<button class="btn btn-dark report">回報問題</button>
+</div>
+</div>
+</div>
+<div class="col-1 buttons m-auto">
+<a class="remove-btn" data-container="body" data-content="Click again to remove" data-placement="bottom" data-toggle="popover" data-trigger="manual" tabindex="0"><i class="bi-x-circle mb-3"></i></a>
+<a class="subtitle-btn"><i class="bi-card-text-strike" title="Subtitles disabled"></i></a>
+<a class="download-btn"><i class="bi-download mb-3"></i></a>
+<a class="info-btn"><i class="bi-info-circle mb-3"></i></a>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="infoModalLabel" class="modal fade" id="infoModal" tabindex="-1">
+<div class="modal-xl modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="infoModalLabel">影片中繼資料</h5>
+<button aria-label="Close" class="close dismiss" type="button">×</button>
+</div>
+<div class="modal-body">
+<div class="container-fluid">
+<div class="row mb-3">
+<div class="thumb col-7">
+<img alt="thumbnail" class="info-img" onerror="this.onerror=null;this.src='img/plain-placeholder.png';" src="img/plain-placeholder.png" title="Click to download"/>
+<i class="img-overlay bi bi-download" title="Click to download"></i>
+</div>
+<div class="col-5">
+<p title="觀看次數"><i class="bi bi-eye"></i>-</p>
+<p title="喜歡 / 不喜歡"><i class="bi bi-hand-thumbs-up"></i>-<i class="bi bi-hand-thumbs-down"></i>-</p>
+<p title="平均評分"><i class="bi bi-star"></i>-</p>
+<p title="時長"><i class="bi bi-clock"></i>-</p>
+</div>
+</div>
+<textarea cols="50" id="info-description" readonly="" rows="5"></textarea>
+<ul class="list-group list-group-flush">
+<li class="list-group-item uploader"></li>
+<li class="list-group-item extractor"></li>
+<li class="list-group-item url"></li>
+</ul>
+</div>
+<span class="identifier d-none"></span>
+</div>
+<div class="modal-footer">
+<button class="btn json btn-dark" title="另存為 JSON" type="button">另存為 JSON</button>
+<button class="btn dismiss btn-dark" type="button">關閉</button>
+</div>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="subsModalLabel" class="modal fade" id="subsModal" tabindex="-1">
+<div class="modal-xl modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="subsModalLabel">字幕設定</h5>
+<button aria-label="Close" class="close dismiss" type="button">×</button>
+</div>
+<div class="modal-body">
+<div class="container-fluid">
+<p class="description">選擇要下載的字幕語言</p>
+<div class="mb-1">
+<input class="check-input" id="enableSubs" type="checkbox" value=""/>
+<label class="check-label" for="enableSubs">下載字幕</label>
+</div>
+<div class="mb-3">
+<label class="form-label d-block" for="subsLang">字幕：</label>
+<select class="w-75 mb-2" id="subsLang" multiple=""></select>
+</div>
+<div>
+<label class="form-label d-block" for="autoGenSubsLang">自動產生字幕：</label>
+<select class="w-75 mb-2" id="autoGenSubsLang" multiple=""></select>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn subsSave btn-dark" type="button">好</button>
+</div>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="logModalLabel" class="modal fade" id="logModal" tabindex="-1">
+<div class="modal-xl modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="logModalLabel">下載紀錄</h5>
+<button aria-label="Close" class="close dismiss" type="button">×</button>
+</div>
+<div class="modal-body">
+<div class="container-fluid">
+<div class="log p-3 rounded w-100">載入紀錄中…</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn save btn-dark" title="儲存為檔案" type="button">儲存為檔案</button>
+<button class="btn btn-dark dismiss" type="button">關閉</button>
+</div>
+<span class="identifier d-none"></span>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="authModalLabel" class="modal fade" id="authModal" tabindex="-1">
+<div class="modal-xl modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="authModalLabel">新增驗證</h5>
+<button aria-label="Close" class="close dismiss" type="button">×</button>
+</div>
+<div class="modal-body">
+<p>新增 cookies.txt 檔案以進行驗證</p>
+<div class="custom-file">
+<input class="custom-file-input" id="fileInput" type="file"/>
+<label class="custom-file-label" for="fileInput" id="fileInputLabel">點選以選擇 cookies.txt</label>
+</div>
+<a href="https://github.com/StefanLobbenmeier/youtube-dl-gui/wiki/Tutorial:-Private-videos-&amp;-playlists" target="_blank">什麼是 cookies.txt 檔案？</a>
+</div>
+<div class="modal-footer">
+<button class="btn removeCookies btn-dark" type="button">移除 cookies</button>
+<button class="btn dismiss btn-highlight" type="button">好</button>
+</div>
+</div>
+</div>
+</div>
+<div aria-hidden="true" aria-labelledby="settingsModalLabel" class="modal fade" id="settingsModal" tabindex="-1">
+<div class="modal-xl modal-dialog modal-dialog-centered">
+<div class="modal-content">
+<div class="modal-header">
+<h5 class="modal-title" id="settingsModalLabel">應用程式設定</h5>
+<a class="help-button" href="https://github.com/StefanLobbenmeier/youtube-dl-gui/wiki/Settings" target="_blank" title="幫助"><i class="bi bi-question-circle"></i></a>
+<button aria-label="Close" class="close dismiss" type="button">×</button>
+</div>
+<div class="modal-body">
+<h3>效能</h3>
+<div class="mb-4">
+<label class="form-label" for="sizeSetting">下載大小計算</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="sizeSetting">
+<option selected="" value="full">自動計算</option>
+<option value="click">點選計算</option>
+</select>
+<input class="check-input" id="calculateTotalSize" type="checkbox" value=""/>
+<label class="check-label" for="calculateTotalSize">計算總下載大小</label>
+</div>
+<div class="mb-4">
+<label class="form-label d-inline-block" for="maxConcurrent" id="concurrentLabel">最大同時作業數</label>
+<input class="form-range w-50 d-block align-middle" id="maxConcurrent" max="32" min="1" type="range"/>
+<button class="btn btn-dark" id="defaultConcurrent" type="button">重設為預設值</button>
+</div>
+<div class="mb-4">
+<label class="form-label" for="fileAccessRetries">資訊請求重試次數：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="fileAccessRetries">
+<option selected="" value="3">3</option>
+<option value="10">10</option>
+<option value="20">20</option>
+<option value="infinite">無限次</option>
+</select>
+</div>
+<div class="mb-4">
+<label class="form-label" for="retries">下載重試次數：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="retries">
+<option selected="" value="10">10</option>
+<option value="50">50</option>
+<option value="100">100</option>
+<option value="infinite">無限次</option>
+</select>
+</div>
+<hr/>
+<h3>外觀</h3>
+<div class="mb-4">
+<label class="form-label" for="theme">主題</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="theme">
+<option selected="" value="dark">深色</option>
+<option value="light">淺色</option>
+</select>
+</div>
+<hr/>
+<h3>自動更新</h3>
+<div class="mb-1">
+<input class="check-input" id="updateBinary" type="checkbox" value=""/>
+<label class="check-label" for="updateBinary">自動更新 ytdl 執行檔</label>
+</div>
+<div>
+<input class="check-input" id="updateApplication" type="checkbox" value=""/>
+<label class="check-label" for="updateApplication">自動更新應用程式</label>
+</div>
+<hr/>
+<h3>網路</h3>
+<div class="mb-4">
+<label class="form-label" for="proxySetting">代理伺服器（若留空則不使用）</label>
+<input class="form-control" id="proxySetting" placeholder="HTTPS/SOCKS proxy URL" type="text" value=""/>
+</div>
+<div class="mb-4">
+<label class="form-label" for="ratelimitSetting">每部影片的下載速率限制（KB/s）</label>
+<input class="form-control" id="ratelimitSetting" placeholder="下載速率限制（KB/s）" type="number" value=""/>
+</div>
+<hr/>
+<h3>輸入</h3>
+<div class="mb-1">
+<input class="check-input" id="autoFillClipboard" type="checkbox" value=""/>
+<label class="check-label" for="autoFillClipboard">自動填入複製的連結</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="noPlaylist" type="checkbox" value=""/>
+<label class="check-label" for="noPlaylist">當連結同時包含清單與影片時僅下載影片</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="globalShortcut" type="checkbox" value=""/>
+<label class="check-label" for="globalShortcut">啟用全域貼上與下載快捷鍵</label>
+</div>
+<hr/>
+<h3>輸出</h3>
+<div class="mb-3">
+<label class="form-label" for="outputFormat">嘗試使用輸出格式：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="outputFormat">
+<option selected="" value="none">自動</option>
+<option value="mp4">MP4</option>
+<option value="mkv">MKV</option>
+</select>
+</div>
+<div class="mb-3">
+<label class="form-label" for="audioOutputFormat">強制音訊下載使用輸出格式：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="audioOutputFormat">
+<option selected="" value="none">自動</option>
+<option value="mp3">MP3</option>
+<option value="m4a">M4A</option>
+<option value="opus">Opus</option>
+<option value="vorbis">Vorbis</option>
+<option value="wav">WAV</option>
+<option value="aac">AAC</option>
+<option value="flac">FLAC</option>
+</select>
+</div>
+<div class="mb-1">
+<label class="form-label" for="nameFormat">檔名格式：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="nameFormat">
+<option selected="" value="%(title).200s-(%(height)sp%(fps).0d).%(ext)s">標題 + 品質</option>
+<option value="%(title).200s.%(ext)s">標題</option>
+<option value="custom">自訂</option>
+</select>
+</div>
+<div class="mb-4">
+<input class="form-control" disabled="" id="nameFormatCustom" type="text" value="%(title).200s-(%(height)sp%(fps).0d).%(ext)s"/>
+</div>
+<div class="mb-1">
+<input class="check-input" id="downloadMetadata" type="checkbox" value=""/>
+<label class="check-label" for="downloadMetadata">儲存中繼資料</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="downloadJsonMetadata" type="checkbox" value=""/>
+<label class="check-label" for="downloadJsonMetadata">儲存 JSON 中繼資料</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="downloadThumbnail" type="checkbox" value=""/>
+<label class="check-label" for="downloadThumbnail">儲存縮圖為檔案</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="keepUnmerged" type="checkbox" value=""/>
+<label class="check-label" for="keepUnmerged">保留未合併的檔案</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="avoidFailingToSaveDuplicateFileName" type="checkbox" value=""/>
+<label class="check-label" for="avoidFailingToSaveDuplicateFileName" title="When the target filename already exists, enumerate the filename (e.g. 'filename(1).mp4') at the cost of download resumability.">避免因重複檔名而儲存失敗</label>
+</div>
+<hr/>
+<h3>SponsorBlock（廣告標記）</h3>
+<div class="mb-3">
+<label class="form-label d-block" for="subsLang">要標記為章節的區段：</label>
+<select class="w-75 mb-2" id="sponsorblockMark" multiple="">
+<option value="sponsor">贊助</option>
+<option value="selfpromo">自我宣傳</option>
+<option value="interaction">互動提醒</option>
+<option value="intro">中場／片頭動畫</option>
+<option value="outro">片尾卡／製作名單</option>
+<option value="preview">預告／回顧</option>
+<option value="music_offtopic">音樂無關內容</option>
+</select>
+</div>
+<div class="mb-3">
+<label class="form-label d-block" for="autoGenSubsLang">要移除的區段：</label>
+<select class="w-75 mb-2" id="sponsorblockRemove" multiple="">
+<option value="sponsor">贊助</option>
+<option value="selfpromo">自我宣傳</option>
+<option value="interaction">互動提醒</option>
+<option value="intro">中場／片頭動畫</option>
+<option value="outro">片尾卡／製作名單</option>
+<option value="preview">預告／回顧</option>
+<option value="music_offtopic">音樂無關內容</option>
+</select>
+</div>
+<div class="mb-1">
+<label class="form-label" for="sponsorblockApi">SponsorBlock API 位置</label>
+<input class="form-control" id="sponsorblockApi" type="text" value=""/>
+</div>
+<hr/>
+<h3>進階</h3>
+<div class="mb-1">
+<input class="check-input" id="taskList" type="checkbox" value=""/>
+<label class="check-label" for="taskList">重新啟動後恢復佇列</label>
+</div>
+<div class="mb-1">
+<label class="check-label" for="userAgent">使用者代理字串</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="userAgent">
+<option selected="" value="spoof">偽裝</option>
+<option value="empty">清空</option>
+<option value="default">預設</option>
+</select>
+</div>
+<div class="mb-1">
+<input class="check-input" id="validateCertificate" type="checkbox" value=""/>
+<label class="check-label" for="validateCertificate">驗證 HTTPS 憑證</label>
+</div>
+<div class="mb-1">
+<input class="check-input" id="enableEncoding" type="checkbox" value=""/>
+<label class="check-label" for="enableEncoding">顯示可供下載的編碼器</label>
+</div>
+<div>
+<label class="form-label" for="splitMode">播放清單切割成單部影片的條件：</label>
+<select class="custom-select d-block rounded w-auto mb-2" id="splitMode">
+<option value="0">永不切割</option>
+<option selected="" value="49">少於 50 部影片時</option>
+<option value="99">少於 100 部影片時</option>
+<option value="149">少於 150 部影片時</option>
+<option value="199">少於 200 部影片時</option>
+</select>
+</div>
+</div>
+<div class="modal-footer">
+<p id="version"></p>
+<button class="btn dismiss btn-dark" type="button">取消</button>
+<button class="btn apply btn-highlight" type="button">套用</button>
+</div>
+</div>
+</div>
+</div>
+<div aria-atomic="true" aria-live="assertive" class="toast" id="update" role="alert">
+<div class="toast-header">
+<strong class="mr-auto update-title">有可用的更新！</strong>
+<button aria-label="Close" class="ml-2 mb-1 close" data-dismiss="toast" type="button">
+<span aria-hidden="true">×</span>
+</button>
+</div>
+<div class="toast-body update-body"></div>
+</div>
+<div aria-atomic="true" aria-live="assertive" class="toast" id="task-list" role="alert">
+<div class="toast-header">
+<strong class="mr-auto task-list-title">是否要恢復佇列？</strong>
+<button aria-label="Close" class="ml-2 mb-1 close" data-dismiss="toast" type="button">
+<span aria-hidden="true">×</span>
+</button>
+</div>
+<div class="toast-body task-list-body"></div>
+</div>
+<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="../node_modules/windowbar/dist/index.js"></script>
+<script src="renderer.js"></script>
 </body>
 </html>
